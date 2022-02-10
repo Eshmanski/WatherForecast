@@ -1,0 +1,68 @@
+@import "variables";
+
+.weather-panel-form {
+
+  form {
+    display: flex;
+    padding: 12px 20px;
+    background-color: $nav-bg-color;
+
+    .btn {
+      width: $controller-size;
+      height: $controller-size;
+      padding: $controller-size / 7;
+      background-color: $nav-btn-color;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+
+      &:hover:not(.active) {
+        background-color: lighten($nav-btn-color, 5);
+        box-shadow: 0 4px 10px rgb(11 23 78 / 50%);
+      }
+
+      &.active:hover {
+        background-color: darken($nav-btn-color, 17);
+      }
+
+      &:active:hover, &.active {
+        background-color: darken($nav-btn-color, 20);
+      }
+
+      &>div:active {
+        opacity: 0.2;
+      }
+    }
+
+    .input {
+      color: #606060;
+      font-size: 1.1rem;
+      width: 100%;
+      height: $controller-size;
+      box-sizing: border-box;
+      padding: 5px 10px;
+      line-height: 30px;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+    }
+
+    .btn-icon {
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      width: 100%;
+      height: 100%;
+    }
+
+    .btns-box {
+      flex-shrink: 0;
+    }
+
+    .input-box {
+      margin: 0 20px;
+      flex-grow: 1;
+    }
+  }
+}
+

@@ -1,0 +1,13 @@
+@import "panel";
+
+body {
+  margin: 0;
+  padding: 0;
+  color: #606060;
+  font-size: 1.1rem;
+}
+
+::-webkit-scrollbar { /* chrome based */
+  width: 0px;  /* ширина scrollbar'a */
+  background: transparent;  /* опционально */
+}

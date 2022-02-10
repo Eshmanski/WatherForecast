@@ -1,0 +1,47 @@
+
+.weather-panel-content {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  height: 100%;
+
+
+  .big-card-list, .small-card-list {
+    height: 100%;
+  }
+
+  .small-card-list {
+    width: calc(30% - 4px);
+  }
+
+  .big-card-list {
+    width: calc(70% - 4px);
+  }
+
+  .small-card-list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #4e6faa;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    @import "small-card";
+  }
+
+  .big-card-list {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    font-weight: bold;
+    color: #4e6faa;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    @import "big-card";
+  }
+
+
+}

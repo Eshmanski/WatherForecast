@@ -1,0 +1,21 @@
+@import "variables";
+@import "mixins";
+
+.weather-panel {
+  margin: 0;
+  width: 40%;
+  height: 100vh;
+  min-width: 600px;
+  min-height: 880px;
+  overflow: hidden;
+  background-color: $panel-bg-color;
+
+  @import "nav-form";
+
+  @import "content";
+}
+
+@each $key, $icon in $icons {
+  @include create-icon($icon);
+}
+

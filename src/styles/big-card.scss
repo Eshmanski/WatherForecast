@@ -1,0 +1,104 @@
+.big-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #f7f8ff;
+  width: 100%;
+  margin: 2px 0;
+  min-height: 188px;
+  cursor: pointer;
+
+  .card-header {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    padding: 20px 20px 14px 20px;
+    background-color: #ffff;
+
+    .icon-strips-big {
+      width: .4rem;
+      height: 1.5rem;
+    }
+
+    .title-card {
+      margin-left: 20px;
+      font-size: 1.9rem;
+      line-height: 1.9rem;
+    }
+  }
+
+  .card-content {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    padding: 16px 24px 24px 20px;
+    background-color: #f7f8ff;
+
+    .card-info-temperature {
+      font-size: 4rem;
+      line-height: 4rem;
+    }
+
+    .card-info-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+
+      .card-info-condition {
+        display: flex;
+        justify-content: start;
+      }
+
+      .card-info-wind {
+        display: flex;
+        justify-content: start;
+        font-size: 1.2rem;
+        align-items: flex-end;
+        color: #aab1ff;
+      }
+    }
+
+    .icon {
+      height: 25px;
+      width: 25px;
+      margin-right: 10px;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+    }
+  }
+}
+
+.big-card.help {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 50px;
+  min-height: 188px;
+  background: transparent;
+
+  span {
+    text-align: center;
+  }
+}
+
+.big-card:last-child {
+  margin-bottom: 200px;
+}
+
+.big-card:hover {
+  .card-header {
+    background-color: #5975f7;
+    color: white;
+  }
+
+  .card-content {
+    background-color: #2a4bde;
+    color: white;
+  }
+}
+
+.big-card:active {
+  filter: drop-shadow(0 8px 20px rgba(11, 23, 78, 0.5));
+}
