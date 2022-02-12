@@ -2,10 +2,9 @@
 @import "mixins";
 
 .weather-panel {
-  margin: 0;
   width: 40%;
   height: 100vh;
-  min-width: 600px;
+  min-width: 650px;
   min-height: 880px;
   overflow: hidden;
   background-color: $panel-bg-color;

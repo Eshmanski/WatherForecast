@@ -4,11 +4,12 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const  HTMLWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    mode: "production",
-    entry: "./src/main.ts",
+    mode: "development",
+    entry: "./src/index.ts",
     output: {
         filename: "script.js",
         path: path.resolve(__dirname, "docs"),
+        assetModuleFilename: 'assets/[name][ext]',
     },
     resolve: {
         extensions: [".ts", ".js"]
@@ -16,20 +17,32 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.s[ac]ss$/i,
-                use: [ MiniCssExtractPlugin.loader, "css-loader", "sass-loader" ],
+                test: /\.css$/i,
+                use: [MiniCssExtractPlugin.loader, "css-loader"],
             },
-            { test: /\.ts$/, loader: "awesome-typescript-loader" },
+            {
+                test: /\.s[ac]ss$/i,
+                use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+            },
+            { test: /\.ts$/, loader: "ts-loader" },
         ]
     },
+    // performance: {
+    //     hints: false,
+    //     maxEntrypointSize: 512000,
+    //     maxAssetSize: 512000
+    // },
     plugins: [
-        new CopyPlugin({
-            patterns: [ { from: "public", to: "icons" } ],
-        }),
-        new MiniCssExtractPlugin({ filename: "styles.css" }),
+        // new CopyPlugin({
+        //     patterns: [ { from: "public", to: "icons" } ],
+        // }),
+
         new HTMLWebpackPlugin({
             template: './src/index.html',
             filename: 'index.html'
+        }),
+        new MiniCssExtractPlugin({
+            filename: 'style.css'
         })
     ]
 }

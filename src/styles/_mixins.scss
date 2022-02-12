@@ -1,5 +1,6 @@
+
 @mixin create-icon($str) {
   .icon-#{$str} {
-    background-image: url('../../public/icons/icon-' + $str + '.svg');
+    background-image: url("./icons/icon-" + $str + ".svg");
   }
 }
