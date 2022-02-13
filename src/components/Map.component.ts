@@ -20,7 +20,7 @@ export class MapComponent extends Component {
     }
 
     public init() {
-        this.service.getMyPosition().then(data => {
+        this.service.fetchMyPosition().then(data => {
             const myPosition = data.loc.split(',').map((coordinate: string) => +coordinate);
 
             let map = L.map('map').setView(myPosition, 13);

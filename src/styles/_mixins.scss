@@ -2,5 +2,6 @@
 @mixin create-icon($str) {
   .icon-#{$str} {
     background-image: url("./icons/icon-" + $str + ".svg");
+    pointer-events: none;
   }
 }

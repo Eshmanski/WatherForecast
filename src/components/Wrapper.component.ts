@@ -1,5 +1,4 @@
 import {Component} from "./Component";
-import {InsertPosition} from "../utils";
 import {RenderOptions} from "../Interfaces";
 
 class WrapperComponent extends Component {

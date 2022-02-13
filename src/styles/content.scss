@@ -32,6 +32,7 @@
   }
 
   .big-card-list {
+    position: relative;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -39,6 +40,16 @@
     color: #4e6faa;
     -ms-overflow-style: none;
     scrollbar-width: none;
+
+    .help-big-card-list {
+      position: absolute;
+      text-align: center;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 188px;
+      padding: 60px;
+    }
 
     @import "big-card";
   }
