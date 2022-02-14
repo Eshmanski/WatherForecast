@@ -101,6 +101,7 @@ export class WeatherService {
 
     public makeCardDraggable(element: Element, cityWeather: City) {
         element.addEventListener('dragstart', (event: DragEvent) => {
+            event.dataTransfer.setData('text', 'anything');
             this.dragOption.dragElement = element as HTMLElement;
             element.classList.add('small-card-shadow');
         });
@@ -149,6 +150,7 @@ export class WeatherService {
                 underListElement.append(this.emptyCardElement);
             }
         });
+        element.addEventListener('drop', (event: Event) => event.preventDefault());
     }
 
     private changePosition(prevCardName: string, cityWeather: City) {
