@@ -1,4 +1,5 @@
 .big-card {
+  position: relative;
   z-index: 99;
   display: flex;
   flex-direction: column;
@@ -68,6 +69,26 @@
       background-size: contain;
     }
   }
+
+
+}
+
+.big-card::before {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background-color: transparent;
+  content: '';
+  top: -2px;
+}
+
+.big-card::after {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background-color: transparent;
+  content: '';
+  bottom: -2px;
 }
 
 .big-card.help {
@@ -88,7 +109,7 @@
   margin-bottom: 200px;
 }
 
-.big-card:hover {
+.big-card:hover, .big-card.active {
   .card-header {
     background-color: #5975f7;
     color: white;
@@ -100,11 +121,7 @@
   }
 }
 
-.big-card.big-card-empty {
-  min-height: 172px;
-  background-color: rgba(247, 248, 255, 0.3);
-  border: 2px dashed #c3d0e7;
-}
+
 
 .big-card:active {
   filter: drop-shadow(0 8px 20px rgba(11, 23, 78, 0.5));

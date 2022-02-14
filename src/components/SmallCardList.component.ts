@@ -2,7 +2,7 @@ import {Component} from "./Component";
 import {SmallCardComponent} from "./SmallCard.component";
 import {WeatherService} from "../Weather.service";
 import {City, RenderOptions} from "../Interfaces";
-import {InsertPosition, WeatherAction} from "../utils";
+import {cardType, InsertPosition, WeatherAction} from "../utils";
 
 export class SmallCardListComponent extends Component {
     service: WeatherService;
@@ -18,7 +18,7 @@ export class SmallCardListComponent extends Component {
     }
 
     protected getTemplate(): string {
-        return (`<div class="small-card-list _list" data-type="smallList"></div>`);
+        return (`<div class="small-card-list _list" data-type="${cardType.small}"></div>`);
     }
 
     protected afterCreateElement() {
@@ -27,6 +27,7 @@ export class SmallCardListComponent extends Component {
         });
 
         this.addEventListeners();
+        this.service.makeListDroppable(this.getElement());
     }
 
 

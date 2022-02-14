@@ -1,12 +1,11 @@
-import {City, ClientData, Weather} from './Interfaces';
-import {createElement, SortType, SortTypeMethods, WeatherAction} from "./utils";
+import {City, ClientData, DragDropOptions, Weather} from './Interfaces';
+import {cardType, createElement, SortType, SortTypeMethods, WeatherAction} from "./utils";
 
 export class WeatherService {
     allCities: City[] = [];
     chosenCities: City[] = [];
     clientData: ClientData;
-    private dragOption:
-        { draggedElement: Element, type: string } = { draggedElement: null, type: ''};
+    private dragOption: DragDropOptions = { dragElement: null, cardType: cardType.big };
     private sortType: SortType = SortType.ABC;
     private filterText: string = '';
     private filterWeather: Weather = {
@@ -18,7 +17,7 @@ export class WeatherService {
         stormy: false,
         metorite: false
     };
-    private emptyCardElement = createElement('<div class="big-card big-card-empty _card_empty _card"></div>')
+    private emptyCardElement = createElement('<div class="big card-empty _card_empty _card"></div>')
 
     constructor() {}
 
@@ -36,9 +35,6 @@ export class WeatherService {
             .then<City[]>(data => data.cities)
             .catch((e) => { throw new Error(e) });
 
-        // // temp code
-        // this.chosenCities = [ ...this.allCities ];
-        // window.dispatchEvent(new CustomEvent('FETCH_FINISHED'));
 
         return this.allCities.sort(SortTypeMethods[this.sortType]);
     }
@@ -84,64 +80,113 @@ export class WeatherService {
     }
 
     public makeCardDraggable(element: Element, cityWeather: City) {
-        element.addEventListener('dragstart', () => {
-            this.dragOption.draggedElement = element;
+        element.addEventListener('dragstart', (event: DragEvent) => {
+            this.dragOption.dragElement = element as HTMLElement;
             element.classList.add('small-card-shadow');
         });
 
         element.addEventListener('dragend', () => {
-            const prevCardName: string =(this.emptyCardElement.previousElementSibling as HTMLElement).dataset.name;
+            const prevCardName: string = (this.emptyCardElement.previousElementSibling as HTMLElement)
+                .dataset.name;
 
             this.changePosition(prevCardName, cityWeather);
 
             element.classList.remove('small-card-shadow');
-            this.dragOption.draggedElement = null;
+            this.dragOption.dragElement = null;
             this.emptyCardElement.remove();
         });
     }
 
     public makeListDroppable(element: Element) {
-        element.addEventListener('dragover', (event: Event) => {
+        element.addEventListener('dragover', (event: DragEvent) => {
             event.preventDefault();
 
-            const underElement: HTMLElement = event.target as HTMLElement;
+            const underElement = event.target as HTMLElement
             const underCardElement: HTMLElement = underElement.closest('._card');
-            const underListElement: HTMLElement = underElement.closest('._list')
+            const underListElement: HTMLElement = underElement.closest('._list');
 
             if (underCardElement?.classList?.contains('_card_empty')
-                || (underCardElement === this.dragOption.draggedElement)) {
+                || (underCardElement === this.dragOption.dragElement)) {
                 return;
             }
 
-            this.dragOption.type = underListElement.dataset.type;
+            this.dragOption.cardType = underListElement.dataset.type as cardType;
+            this.resizeEmptyElement();
 
-            if(underCardElement && underCardElement.dataset.type === 'bigCard') {
+            if(underCardElement) {
                 if(underCardElement.previousElementSibling.classList.contains('_card_empty')) {
                     underListElement.insertBefore(this.emptyCardElement, underCardElement.nextElementSibling);
                 } else {
                     underListElement.insertBefore(this.emptyCardElement, underCardElement);
                 }
-            } else if(underListElement.dataset.type === 'bigList') {
+            } else {
                 underListElement.append(this.emptyCardElement);
             }
         });
     }
 
-    private emitEvent(action: WeatherAction, data: any) {
-        window.dispatchEvent(new CustomEvent(action, { detail: data }));
+    private changePosition(prevCardName: string, cityWeather: City) {
+        const underCardType: cardType = this.dragOption.cardType;
+        const dragCardType: cardType = this.dragOption.dragElement.dataset.type as cardType;
+
+        let toData: City[];
+        let doUnsetSort: boolean = false;
+        let data: City;
+
+        if(underCardType === cardType.big && dragCardType === cardType.small) {
+            this.allCities = this.allCities.filter((item: City) => item.city !== cityWeather.city);
+            toData = this.chosenCities;
+
+            data = cityWeather;
+        } else if(underCardType === cardType.small && dragCardType === cardType.big) {
+            this.chosenCities = this.chosenCities.filter((item: City) => item.city !== cityWeather.city);
+            toData = this.allCities;
+
+            doUnsetSort = true;
+        } else if(underCardType === cardType.big && dragCardType === cardType.big) {
+            this.chosenCities = this.chosenCities.filter((item: City) => item.city !== cityWeather.city);
+            toData = this.chosenCities;
+        } else {
+            this.allCities = this.allCities.filter((item: City) => item.city !== cityWeather.city);
+            toData = this.allCities;
+
+            doUnsetSort = true;
+        }
+
+
+        if(prevCardName === undefined) {
+            toData.unshift(cityWeather);
+        } else {
+            const idx = toData.findIndex((item: City) => item.city === prevCardName);
+            toData.splice(idx + 1, 0, cityWeather);
+        }
+
+        if(doUnsetSort) {
+            this.sortType = SortType.NONE;
+            this.emitEvent(WeatherAction.SORT_UNSET);
+        }
+
+        this.emitEvent(WeatherAction.CARD_UPDATE_POSITION, data);
     }
 
 
-    private changePosition(prevCardName: string, cityWeather: any) {
-        this.allCities = this.allCities.filter((item: City) => item.city !== cityWeather.city);
+    private resizeEmptyElement() {
+        if(this.emptyCardElement.classList.contains(this.dragOption.cardType))
+            return;
 
-        if(prevCardName === undefined) {
-            this.chosenCities.unshift(cityWeather);
-        } else {
-            const idx = this.chosenCities.findIndex((item: City) => item.city === prevCardName);
-            this.chosenCities.splice(idx + 1, 0, cityWeather);
+        switch(this.dragOption.cardType) {
+            case cardType.big:
+                this.emptyCardElement.classList.replace('small', this.dragOption.cardType);
+                break;
+            case cardType.small:
+                this.emptyCardElement.classList.replace('big', this.dragOption.cardType);
+                break;
         }
+    }
 
-        this.emitEvent(WeatherAction.CARD_UPDATE_POSITION, cityWeather);
+
+
+    private emitEvent(action: WeatherAction, data?: any) {
+        window.dispatchEvent(new CustomEvent(action, { detail: data }));
     }
 }

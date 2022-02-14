@@ -1,4 +1,4 @@
-import {InsertPosition} from "./utils";
+import {cardType, InsertPosition} from "./utils";
 import { Component } from "./components/Component";
 
 export interface City {
@@ -48,3 +48,7 @@ export interface NavControllers {
     weatherSort: NodeList;
 }
 
+export interface DragDropOptions {
+    dragElement: HTMLElement;
+    cardType: cardType;
+}

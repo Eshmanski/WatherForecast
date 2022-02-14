@@ -1,11 +1,12 @@
 import {Component} from "./Component";
 import {WeatherService} from "../Weather.service";
 import {City, RenderOptions} from "../Interfaces";
-import {InsertPosition, WeatherAction} from "../utils";
+import {cardType, InsertPosition, WeatherAction} from "../utils";
 import {BigCardComponent} from "./BigCard.component";
 
 export class BigCardListComponent extends Component {
     service: WeatherService;
+    helperText: HTMLElement;
     state: {
         chosenCities: City[];
     };
@@ -17,25 +18,22 @@ export class BigCardListComponent extends Component {
         this.state = { chosenCities: [] };
     }
 
-    protected afterCreateElement() {
-        window.addEventListener('FETCH_FINISHED', () => {
-            const citiesWeather: City[] = this.service.getCityForBigList();
-            this.setState({ chosenCities: citiesWeather });
-        });
-
-        window.addEventListener(WeatherAction.FILTER_CHANGES, () => this.dataChangeHandler());
-        window.addEventListener(WeatherAction.CARD_UPDATE_POSITION, () => this.dataChangeHandler());
-
-        this.service.makeListDroppable(this.getElement());
-    }
-
     protected getTemplate(): string {
         return (`
-            <div class="big-card-list _list" data-type="bigList">
-                <div class="help-big-card-list"><span>Перетащите сюда города, погода в которых вам интересна</span></div>
+            <div class="big-card-list _list" data-type="${cardType.big}">
+                <div class="help-big-card-list _helperText"><span>Перетащите сюда города, погода в которых вам интересна</span></div>
             </div>
         `);
     }
+
+    protected afterCreateElement() {
+        this.helperText = this.getElement().querySelector('._helperText')
+        window.addEventListener(WeatherAction.FILTER_CHANGES, () => this.dataChangeHandler());
+        window.addEventListener(WeatherAction.CARD_UPDATE_POSITION, () => this.dataChangeHandler());
+        this.service.makeListDroppable(this.getElement());
+    }
+
+
 
     protected getRenderOptions(): RenderOptions[] {
         const rendersOptions: RenderOptions[] = [];
@@ -51,6 +49,10 @@ export class BigCardListComponent extends Component {
 
     private dataChangeHandler() {
         const data = this.service.getCityForBigList();
+
+        if(data.length !== 0) this.helperText.style.visibility = 'hidden';
+        else this.helperText.style.visibility = 'visible';
+
         this.setState({ chosenCities: data });
         this.getElement().scroll(0, 0);
     }

@@ -1,6 +1,7 @@
 import {Component} from "./Component";
 import {WeatherService} from "../Weather.service";
 import {City, RenderOptions, Weather} from "../Interfaces";
+import {cardType} from "../utils";
 
 export class BigCardComponent extends Component {
     service: WeatherService;
@@ -28,7 +29,8 @@ export class BigCardComponent extends Component {
             }).join('');
 
         return (`
-        <div class="big-card _card" draggable="true" data-type="bigCard" data-name="${city}">
+        <div class="big-card _card" draggable="true" data-type="${cardType.big}" data-name="${city}">
+            <div class="event-catcher-big-card"></div>
             <div class="card-header">
                 <span class="icon-strips-big"></span>
                 <span class="title-card">${city}</span>
@@ -49,6 +51,20 @@ export class BigCardComponent extends Component {
             </div>
         </div>
         `);
+    }
+
+    protected afterCreateElement() {
+        this.service.makeCardDraggable(this.getElement(), this.props.cityWeather);
+
+        this.getElement().addEventListener('click', (event: Event) => {
+            const target: HTMLElement = (event.target as HTMLElement).closest('.big-card');
+            target
+                .parentElement
+                .querySelectorAll('.active')
+                .forEach((el: HTMLElement) => el.classList.remove('active'));
+
+            target.classList.add('active');
+        });
     }
 
     protected getRenderOptions(): RenderOptions[] {

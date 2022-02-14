@@ -1,6 +1,7 @@
 import {Component} from "./Component";
 import {City, RenderOptions} from "../Interfaces";
 import {WeatherService} from "../Weather.service";
+import {cardType} from "../utils";
 
 export class SmallCardComponent extends Component {
     cityWeather: City;
@@ -15,7 +16,7 @@ export class SmallCardComponent extends Component {
 
     protected getTemplate(): string {
         return (`
-            <div class="small-card _card" draggable="true" data-type="smallCard" data-name="${this.cityWeather.city}">
+            <div class="small-card _card" draggable="true" data-type="${cardType.small}" data-name="${this.cityWeather.city}">
                 <span class="title-card">${this.cityWeather.city}</span>
                 <span>${this.cityWeather.temperature}°</span>
                 <span class="icon-strips-small"></span>

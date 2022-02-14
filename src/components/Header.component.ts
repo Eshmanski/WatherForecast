@@ -1,7 +1,7 @@
 import {Component} from "./Component";
 import {WeatherService} from "../Weather.service";
 import {NavControllers, RenderOptions, Weather} from "../Interfaces";
-import {SortType} from "../utils";
+import {SortType, WeatherAction} from "../utils";
 
 export class HeaderComponent extends Component {
     service: WeatherService;
@@ -55,6 +55,7 @@ export class HeaderComponent extends Component {
             }
         );
 
+        window.addEventListener(WeatherAction.SORT_UNSET, () => this.unsetSortHandler())
     }
 
     toggleSort(sortType: SortType, event: MouseEvent) {
@@ -89,5 +90,10 @@ export class HeaderComponent extends Component {
         const btn: HTMLElement = event.target as HTMLButtonElement;
         btn.classList.toggle('active');
         this.service.toggleFilterWeather(btn.dataset.weather as keyof Weather);
+    }
+
+    private unsetSortHandler() {
+        this.controllers.toggleSortDown.classList.remove('active');
+        this.controllers.toggleSortUp.classList.remove('active');
     }
 }
