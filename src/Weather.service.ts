@@ -124,6 +124,9 @@ export class WeatherService {
         element.addEventListener('dragover', (event: DragEvent) => {
             event.preventDefault();
 
+            if(!this.dragOption.dragElement)
+                    return;
+
             const underElement = event.target as HTMLElement
             const underCardElement: HTMLElement = underElement.closest('._card');
             const underListElement: HTMLElement = underElement.closest('._list');
