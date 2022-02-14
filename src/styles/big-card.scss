@@ -1,9 +1,10 @@
 .big-card {
+  box-sizing: border-box;
+  border: 2px solid $border-color;
   position: relative;
   z-index: 99;
   display: flex;
   flex-direction: column;
-  background-color: #f7f8ff;
   width: 100%;
   margin: 2px 0;
   min-height: 188px;
@@ -14,7 +15,7 @@
     display: flex;
     align-items: center;
     padding: 20px 20px 14px 20px;
-    background-color: #ffff;
+    background-color: $big-card-header-color;
 
     .icon-strips-big {
       width: .4rem;
@@ -34,7 +35,7 @@
     justify-content: space-between;
     align-items: stretch;
     padding: 16px 24px 24px 20px;
-    background-color: #f7f8ff;
+    background-color: $big-card-content-color;
 
     .card-info-temperature {
       font-size: 4rem;
@@ -56,7 +57,6 @@
         justify-content: start;
         font-size: 1.2rem;
         align-items: flex-end;
-        color: #aab1ff;
       }
     }
 
@@ -110,14 +110,17 @@
 }
 
 .big-card:hover, .big-card.active {
+
+  border: 2px solid $border-a-color;
+
   .card-header {
-    background-color: #5975f7;
-    color: white;
+    background-color: $big-card-header-a-color;
+    color: $text-a-color;
   }
 
   .card-content {
-    background-color: #2a4bde;
-    color: white;
+    background-color: $big-card-content-a-color;
+    color: $text-a-color;
   }
 }
 

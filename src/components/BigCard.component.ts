@@ -1,7 +1,7 @@
 import {Component} from "./Component";
 import {WeatherService} from "../Weather.service";
 import {City, RenderOptions, Weather} from "../Interfaces";
-import {cardType} from "../utils";
+import {CardType} from "../utils";
 
 export class BigCardComponent extends Component {
     service: WeatherService;
@@ -29,7 +29,7 @@ export class BigCardComponent extends Component {
             }).join('');
 
         return (`
-        <div class="big-card _card" draggable="true" data-type="${cardType.big}" data-name="${city}">
+        <div class="big-card _card" draggable="true" data-type="${CardType.big}" data-name="${city}">
             <div class="event-catcher-big-card"></div>
             <div class="card-header">
                 <span class="icon-strips-big"></span>
@@ -56,18 +56,33 @@ export class BigCardComponent extends Component {
     protected afterCreateElement() {
         this.service.makeCardDraggable(this.getElement(), this.props.cityWeather);
 
-        this.getElement().addEventListener('click', (event: Event) => {
-            const target: HTMLElement = (event.target as HTMLElement).closest('.big-card');
-            target
-                .parentElement
-                .querySelectorAll('.active')
-                .forEach((el: HTMLElement) => el.classList.remove('active'));
+        this.getElement().addEventListener('click', (event: Event) => this.clickHandler(event));
+        this.getElement().addEventListener('mouseenter', (event: Event) => this.mouseEnterHandler(event));
+        this.getElement().addEventListener('mouseleave', (event: Event) => this.mouseLeaveHandler(event));
+    }
 
-            target.classList.add('active');
-        });
+    private clickHandler(event: Event): void {
+        const target: HTMLElement = (event.target as HTMLElement).closest('.big-card');
+        target
+            .parentElement
+            .querySelectorAll('.active')
+            .forEach((el: HTMLElement) => el.classList.remove('active'));
+
+
+        target.classList.add('active');
+
+        this.service.mouseClickCard(this.props.cityWeather.city);
     }
 
     protected getRenderOptions(): RenderOptions[] {
         return [];
+    }
+
+    private mouseEnterHandler(event: Event) {
+        this.service.mouseOverCard(this.props.cityWeather.city);
+    }
+
+    private mouseLeaveHandler(event: Event) {
+        this.service.mouseOutCard(this.props.cityWeather.city);
     }
 }

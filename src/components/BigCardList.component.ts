@@ -1,7 +1,7 @@
 import {Component} from "./Component";
 import {WeatherService} from "../Weather.service";
 import {City, RenderOptions} from "../Interfaces";
-import {cardType, InsertPosition, WeatherAction} from "../utils";
+import {CardType, InsertPosition, WeatherAction} from "../utils";
 import {BigCardComponent} from "./BigCard.component";
 
 export class BigCardListComponent extends Component {
@@ -20,7 +20,7 @@ export class BigCardListComponent extends Component {
 
     protected getTemplate(): string {
         return (`
-            <div class="big-card-list _list" data-type="${cardType.big}">
+            <div class="big-card-list _list" data-type="${CardType.big}">
                 <div class="help-big-card-list _helperText"><span>Перетащите сюда города, погода в которых вам интересна</span></div>
             </div>
         `);
@@ -30,10 +30,10 @@ export class BigCardListComponent extends Component {
         this.helperText = this.getElement().querySelector('._helperText')
         window.addEventListener(WeatherAction.FILTER_CHANGES, () => this.dataChangeHandler());
         window.addEventListener(WeatherAction.CARD_UPDATE_POSITION, () => this.dataChangeHandler());
+        window.addEventListener(WeatherAction.MOUSE_OVER_MARKER, (event: CustomEvent) => this.activeCardHandler(event));
+        window.addEventListener(WeatherAction.MOUSE_OUT_MARKER, (event: CustomEvent) => this.disableCardHandler(event));
         this.service.makeListDroppable(this.getElement());
     }
-
-
 
     protected getRenderOptions(): RenderOptions[] {
         const rendersOptions: RenderOptions[] = [];
@@ -55,5 +55,17 @@ export class BigCardListComponent extends Component {
 
         this.setState({ chosenCities: data });
         this.getElement().scroll(0, 0);
+    }
+
+    private activeCardHandler(event: CustomEvent) {
+        const name = event.detail;
+        this.getElement().querySelector(`[data-name="${name}"]`)
+            .classList.add('active');
+    }
+
+    private disableCardHandler(event: CustomEvent) {
+        const name = event.detail;
+        this.getElement().querySelector(`[data-name="${name}"]`)
+            .classList.remove('active');
     }
 }

@@ -27,16 +27,10 @@ module.exports = {
             { test: /\.ts$/, loader: "ts-loader" },
         ]
     },
-    // performance: {
-    //     hints: false,
-    //     maxEntrypointSize: 512000,
-    //     maxAssetSize: 512000
-    // },
     plugins: [
-        // new CopyPlugin({
-        //     patterns: [ { from: "public", to: "icons" } ],
-        // }),
-
+        new CopyPlugin({
+            patterns: [ { from: "public", to: "." } ],
+        }),
         new HTMLWebpackPlugin({
             template: './src/index.html',
             filename: 'index.html'

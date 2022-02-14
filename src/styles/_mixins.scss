@@ -3,5 +3,6 @@
   .icon-#{$str} {
     background-image: url("./icons/icon-" + $str + ".svg");
     pointer-events: none;
+    filter: contrast(200%);
   }
 }

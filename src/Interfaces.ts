@@ -1,18 +1,20 @@
-import {cardType, InsertPosition} from "./utils";
+import {CardType, InsertPosition} from "./utils";
 import { Component } from "./components/Component";
 
 export interface City {
     city: string;
-    coordinates: {
-        latitude: number;
-        longitude: number;
-    };
+    coordinates: Coordinates;
     weather: Weather;
     temperature: string;
     wind: {
         direction: string;
         speed: string;
     };
+}
+
+export interface Coordinates {
+    latitude: number;
+    longitude: number;
 }
 
 export interface Weather {
@@ -44,11 +46,11 @@ export interface RenderOptions {
 export interface NavControllers {
     toggleSortUp: HTMLElement;
     toggleSortDown: HTMLElement;
-    inputSort: HTMLElement;
-    weatherSort: NodeList;
+    textFilter: HTMLElement;
+    weatherFilter: NodeList;
 }
 
 export interface DragDropOptions {
     dragElement: HTMLElement;
-    cardType: cardType;
+    cardType: CardType;
 }

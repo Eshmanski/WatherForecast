@@ -42,20 +42,21 @@ export class HeaderComponent extends Component {
         this.controllers = {
             toggleSortUp: this.getElement().querySelector('._toggle_up'),
             toggleSortDown: this.getElement().querySelector('._toggle_down'),
-            inputSort: this.getElement().querySelector('._input_sort'),
-            weatherSort: this.getElement().querySelectorAll('._btn_sort_weather')
+            textFilter: this.getElement().querySelector('._input_sort'),
+            weatherFilter: this.getElement().querySelectorAll('._btn_sort_weather')
         };
 
         this.controllers.toggleSortDown.onclick = (event: MouseEvent) => this.toggleSort(SortType.ZYX, event);
         this.controllers.toggleSortUp.onclick = (event: MouseEvent) => this.toggleSort(SortType.ABC, event);
-        this.controllers.inputSort.oninput = (event: InputEvent) => this.filterByText(event);
-        this.controllers.weatherSort.forEach(
+        this.controllers.textFilter.oninput = (event: InputEvent) => this.filterByText(event);
+        this.controllers.weatherFilter.forEach(
             (btn: HTMLElement): void => {
                 btn.onclick = (event: MouseEvent) => this.filterByWeather(event);
             }
         );
 
-        window.addEventListener(WeatherAction.SORT_UNSET, () => this.unsetSortHandler())
+        window.addEventListener(WeatherAction.SORT_RESET, () => this.resetSortHandler());
+        window.addEventListener(WeatherAction.FILTER_WEATHER_RESET, () => this.resetFilterWeatherHandler());
     }
 
     toggleSort(sortType: SortType, event: MouseEvent) {
@@ -87,13 +88,20 @@ export class HeaderComponent extends Component {
 
     private filterByWeather(event: MouseEvent) {
         event.preventDefault();
+
         const btn: HTMLElement = event.target as HTMLButtonElement;
+
         btn.classList.toggle('active');
+
         this.service.toggleFilterWeather(btn.dataset.weather as keyof Weather);
     }
 
-    private unsetSortHandler() {
+    private resetSortHandler() {
         this.controllers.toggleSortDown.classList.remove('active');
         this.controllers.toggleSortUp.classList.remove('active');
+    }
+
+    private resetFilterWeatherHandler() {
+        this.controllers.weatherFilter.forEach((el:HTMLElement) => el.classList.remove('active'));
     }
 }

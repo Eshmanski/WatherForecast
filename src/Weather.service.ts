@@ -1,11 +1,11 @@
 import {City, ClientData, DragDropOptions, Weather} from './Interfaces';
-import {cardType, createElement, SortType, SortTypeMethods, WeatherAction} from "./utils";
+import {CardType, ChangePositionType, createElement, SortType, SortTypeMethods, WeatherAction} from "./utils";
 
 export class WeatherService {
     allCities: City[] = [];
     chosenCities: City[] = [];
     clientData: ClientData;
-    private dragOption: DragDropOptions = { dragElement: null, cardType: cardType.big };
+    private dragOption: DragDropOptions = { dragElement: null, cardType: CardType.big };
     private sortType: SortType = SortType.ABC;
     private filterText: string = '';
     private filterWeather: Weather = {
@@ -79,6 +79,26 @@ export class WeatherService {
         this.emitEvent(WeatherAction.FILTER_CHANGES, this.filterWeather[key]);
     }
 
+    onMarkerOver(city: string) {
+        this.emitEvent(WeatherAction.MOUSE_OVER_MARKER, city);
+    }
+
+    onMarkerOut(city: string) {
+        this.emitEvent(WeatherAction.MOUSE_OUT_MARKER, city);
+    }
+
+    mouseOverCard(city: string) {
+        this.emitEvent(WeatherAction.MOUSE_OVER_CARD, city);
+    }
+
+    mouseOutCard(city: string) {
+        this.emitEvent(WeatherAction.MOUSE_OUT_CARD, city);
+    }
+
+    mouseClickCard(city: string) {
+        this.emitEvent(WeatherAction.MOUSE_CLICK_CARD, city);
+    }
+
     public makeCardDraggable(element: Element, cityWeather: City) {
         element.addEventListener('dragstart', (event: DragEvent) => {
             this.dragOption.dragElement = element as HTMLElement;
@@ -86,10 +106,13 @@ export class WeatherService {
         });
 
         element.addEventListener('dragend', () => {
-            const prevCardName: string = (this.emptyCardElement.previousElementSibling as HTMLElement)
-                .dataset.name;
+            if(document.contains(this.emptyCardElement)) {
+                const prevCardName: string = (this.emptyCardElement.previousElementSibling as HTMLElement)
+                    .dataset.name;
 
-            this.changePosition(prevCardName, cityWeather);
+                this.changePosition(prevCardName, cityWeather);
+            }
+
 
             element.classList.remove('small-card-shadow');
             this.dragOption.dragElement = null;
@@ -110,7 +133,7 @@ export class WeatherService {
                 return;
             }
 
-            this.dragOption.cardType = underListElement.dataset.type as cardType;
+            this.dragOption.cardType = underListElement.dataset.type as CardType;
             this.resizeEmptyElement();
 
             if(underCardElement) {
@@ -126,65 +149,89 @@ export class WeatherService {
     }
 
     private changePosition(prevCardName: string, cityWeather: City) {
-        const underCardType: cardType = this.dragOption.cardType;
-        const dragCardType: cardType = this.dragOption.dragElement.dataset.type as cardType;
+        const changePositionType: ChangePositionType = this.createChangePositionType();
 
-        let toData: City[];
-        let doUnsetSort: boolean = false;
-        let data: City;
+        let toStorage: City[];
+        let data: { cityWeather: City, changePositionType: ChangePositionType } = {cityWeather, changePositionType};
 
-        if(underCardType === cardType.big && dragCardType === cardType.small) {
+        if(changePositionType.split('=>')[0] === 'small')
             this.allCities = this.allCities.filter((item: City) => item.city !== cityWeather.city);
-            toData = this.chosenCities;
-
-            data = cityWeather;
-        } else if(underCardType === cardType.small && dragCardType === cardType.big) {
+         else
             this.chosenCities = this.chosenCities.filter((item: City) => item.city !== cityWeather.city);
-            toData = this.allCities;
-
-            doUnsetSort = true;
-        } else if(underCardType === cardType.big && dragCardType === cardType.big) {
-            this.chosenCities = this.chosenCities.filter((item: City) => item.city !== cityWeather.city);
-            toData = this.chosenCities;
-        } else {
-            this.allCities = this.allCities.filter((item: City) => item.city !== cityWeather.city);
-            toData = this.allCities;
-
-            doUnsetSort = true;
-        }
 
 
-        if(prevCardName === undefined) {
-            toData.unshift(cityWeather);
-        } else {
-            const idx = toData.findIndex((item: City) => item.city === prevCardName);
-            toData.splice(idx + 1, 0, cityWeather);
-        }
-
-        if(doUnsetSort) {
-            this.sortType = SortType.NONE;
-            this.emitEvent(WeatherAction.SORT_UNSET);
+        switch(changePositionType) {
+            case ChangePositionType.SmallToBig:
+                toStorage = this.chosenCities;
+                this.pushToStorage(toStorage, prevCardName, cityWeather);
+                this.unsetFilterWeather();
+                break;
+            case ChangePositionType.BigToSmall:
+                toStorage = this.allCities;
+                this.pushToStorage(toStorage, prevCardName, cityWeather);
+                this.unsetSort();
+                break;
+            case ChangePositionType.BigToBig:
+                toStorage = this.chosenCities;
+                this.pushToStorage(toStorage, prevCardName, cityWeather);
+                break;
+            case ChangePositionType.SmallToSmall:
+                toStorage = this.allCities;
+                this.pushToStorage(toStorage, prevCardName, cityWeather);
+                this.unsetSort();
+                break;
         }
 
         this.emitEvent(WeatherAction.CARD_UPDATE_POSITION, data);
     }
-
 
     private resizeEmptyElement() {
         if(this.emptyCardElement.classList.contains(this.dragOption.cardType))
             return;
 
         switch(this.dragOption.cardType) {
-            case cardType.big:
+            case CardType.big:
                 this.emptyCardElement.classList.replace('small', this.dragOption.cardType);
                 break;
-            case cardType.small:
+            case CardType.small:
                 this.emptyCardElement.classList.replace('big', this.dragOption.cardType);
                 break;
         }
     }
 
+    private unsetSort() {
+        this.sortType = SortType.NONE;
+        this.emitEvent(WeatherAction.SORT_RESET);
+    }
 
+    private unsetFilterWeather() {
+        this.filterWeather = {
+            sunny: false,
+            cloudy: false,
+            snowy: false,
+            rainy: false,
+            blizzard: false,
+            stormy: false,
+            metorite: false
+        };
+
+        this.emitEvent(WeatherAction.FILTER_WEATHER_RESET);
+    }
+
+    private createChangePositionType(): ChangePositionType {
+        return (this.dragOption.dragElement.dataset.type + '=>' + this.dragOption.cardType) as ChangePositionType;
+    }
+
+    private pushToStorage(toStorage: City[], prevCardName: string, cityWeather: City) {
+        if(prevCardName === undefined) {
+            toStorage.unshift(cityWeather);
+        } else {
+            const idx = toStorage.findIndex((item: City) => item.city === prevCardName);
+
+            if(idx+1 === toStorage.length) toStorage.push(cityWeather);
+            else toStorage.splice(idx + 1, 0, cityWeather);
+        }
+    }
 
     private emitEvent(action: WeatherAction, data?: any) {
         window.dispatchEvent(new CustomEvent(action, { detail: data }));
