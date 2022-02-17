@@ -1,4 +1,4 @@
-import {createElement, InsertPosition, renderElement} from "../utils";
+import {createElement, InsertPosition} from "../utils";
 import {RenderOptions} from "../Interfaces";
 
 export abstract class Component {
@@ -23,13 +23,8 @@ export abstract class Component {
         return this.element;
     }
 
-    protected afterCreateElement(): void {}
-
-    protected abstract getRenderOptions(): RenderOptions[];
-
-    protected setState(state: Object): void {
-        this.state = {...this.state, ...state};
-        this.renderChildren();
+    protected getRenderOptions(): RenderOptions[]{
+        return [];
     }
 
     protected renderChildren(): void {
@@ -40,11 +35,42 @@ export abstract class Component {
             const { child, insertPosition} = renderOptions;
 
             this.children.push(child);
-            renderElement(this.element, child.getElement(), insertPosition);
+            Component.renderElement(this.element, child, insertPosition);
         });
+    }
+
+    protected afterCreateElement(): void {}
+
+    protected afterInsertInDOM(): void {}
+
+    protected setState(state: Object): void {
+        this.state = {...this.state, ...state};
+        this.renderChildren();
     }
 
     protected destroy(): void {
         this.element.remove();
+    }
+
+    static renderElement(
+        container: Element,
+        component: Component,
+        insertPosition: InsertPosition = InsertPosition.AFTEREND
+    ): void {
+        const element: Element = component.getElement();
+
+        switch(insertPosition) {
+            case InsertPosition.BEFOREEND:
+                container.append(element);
+                break;
+            case InsertPosition.AFTERBEGIN:
+                container.prepend(element);
+                break;
+            default:
+                container.insertAdjacentElement(insertPosition, element);
+                break;
+        }
+
+        component.afterInsertInDOM();
     }
 }

@@ -17,16 +17,12 @@ export class PanelComponent extends Component {
 
     protected getTemplate(): string {
         return (`
-            <div class="weather-panel">
-                
-            </div>
+            <div class="weather-panel"></div>
         `);
     }
 
     protected getRenderOptions(): RenderOptions[] {
         const headerComponent: HeaderComponent = new HeaderComponent(this.service);
-
-        const contentContainer = this.getElement().querySelector('._contentContainer');
 
         const smallCardListComponent: SmallCardListComponent = new SmallCardListComponent(this.service);
         const bigCardListComponent: BigCardListComponent = new BigCardListComponent(this.service);
@@ -41,5 +37,4 @@ export class PanelComponent extends Component {
                     ]), insertPosition: InsertPosition.BEFOREEND},
         ];
     }
-
 }

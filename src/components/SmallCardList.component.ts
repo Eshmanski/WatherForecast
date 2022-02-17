@@ -14,14 +14,24 @@ export class SmallCardListComponent extends Component {
         super();
 
         this.service = service;
-        this.state = { allCities: service.allCities };
+        this.state = { allCities: service.allCities }
     }
 
     protected getTemplate(): string {
         return (`<div class="small-card-list _list" data-type="${CardType.small}"></div>`);
     }
 
-    protected afterCreateElement() {
+    protected getRenderOptions(): RenderOptions[] {
+        const rendersOptions: RenderOptions[] = [];
+        this.state.allCities.forEach((city) => {
+            const smallCardComponent: Component = new SmallCardComponent(city, this.service);
+            rendersOptions.push({child: smallCardComponent, insertPosition: InsertPosition.BEFOREEND});
+        });
+
+        return rendersOptions;
+    }
+
+    protected afterCreateElement(): void {
         this.service.fetchAllCity().then(allCities => {
             this.setState( { allCities } );
         });
@@ -30,27 +40,15 @@ export class SmallCardListComponent extends Component {
         this.service.makeListDroppable(this.getElement());
     }
 
-
-    private addEventListeners() {
-        window.addEventListener(WeatherAction.SORT_CHANGES, (event) => this.dataChangeHandler(event));
-        window.addEventListener(WeatherAction.SEARCH_CHANGES, (event) => this.dataChangeHandler(event));
-        window.addEventListener(WeatherAction.CARD_UPDATE_POSITION, (event) => this.dataChangeHandler(event));
+    private addEventListeners(): void {
+        window.addEventListener(WeatherAction.SORT_CHANGES, () => this.dataChangeHandler());
+        window.addEventListener(WeatherAction.SEARCH_CHANGES, () => this.dataChangeHandler());
+        window.addEventListener(WeatherAction.CARD_UPDATE_POSITION, () => this.dataChangeHandler());
     }
 
-    private dataChangeHandler(event: Event) {
+    private dataChangeHandler(): void {
         const citiesList: City[] = this.service.getCityForSmallList();
         this.setState({ allCities: citiesList });
         this.getElement().scroll(0, 0);
-    }
-
-
-    protected getRenderOptions(): RenderOptions[] {
-        const rendersOptions: RenderOptions[] = [];
-        this.state.allCities.forEach((city) => {
-            const smallCardComponent: SmallCardComponent = new SmallCardComponent(city, this.service);
-            rendersOptions.push({child: smallCardComponent, insertPosition: InsertPosition.BEFOREEND});
-        });
-
-        return rendersOptions;
     }
 }

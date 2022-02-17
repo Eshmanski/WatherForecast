@@ -1,5 +1,5 @@
 import {Component} from "./Component";
-import {City, RenderOptions} from "../Interfaces";
+import {City} from "../Interfaces";
 import {WeatherService} from "../Weather.service";
 import {CardType} from "../utils";
 
@@ -26,9 +26,5 @@ export class SmallCardComponent extends Component {
 
     protected afterCreateElement(): void {
         this.service.makeCardDraggable(this.getElement(), this.cityWeather);
-    }
-
-    protected getRenderOptions(): RenderOptions[] {
-        return [];
     }
 }

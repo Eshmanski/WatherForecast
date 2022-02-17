@@ -1,7 +1,8 @@
 import {PanelComponent} from "./components/Panel.component";
-import {InsertPosition, renderElement} from "./utils";
+import {InsertPosition} from "./utils";
 import {MapComponent} from "./components/Map.component";
 import {WeatherService} from "./Weather.service";
+import {Component} from "./components/Component";
 
 export class App {
     service: WeatherService;
@@ -10,15 +11,11 @@ export class App {
         this.service = service;
     }
 
-    init(appElement: Element) {
-        const panelComponent = new PanelComponent(this.service);
-        const panelElement = panelComponent.getElement();
-        renderElement(appElement, panelElement, InsertPosition.BEFOREEND);
+    init(appElement: Element): void {
+        const panelComponent: Component = new PanelComponent(this.service);
+        Component.renderElement(appElement, panelComponent, InsertPosition.BEFOREEND);
 
-        const mapComponent = new MapComponent(this.service);
-        const mapElement = mapComponent.getElement();
-        renderElement(appElement, mapElement, InsertPosition.BEFOREEND);
-
-        mapComponent.init();
+        const mapComponent: Component = new MapComponent(this.service);
+        Component.renderElement(appElement, mapComponent, InsertPosition.BEFOREEND);
     }
 }

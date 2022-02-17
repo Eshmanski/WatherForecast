@@ -10,7 +10,6 @@ class WrapperComponent extends Component {
         super();
 
         this.template = template;
-
         this.rendersOptions = rendersOptions;
     }
 
@@ -23,6 +22,6 @@ class WrapperComponent extends Component {
     }
 }
 
-export function createWrapper(template: string, rendersOptions: RenderOptions[]) {
+export function createWrapper(template: string, rendersOptions: RenderOptions[]): Component {
     return new WrapperComponent(template, rendersOptions);
 }

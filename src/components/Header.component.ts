@@ -38,7 +38,7 @@ export class HeaderComponent extends Component {
         `);
     }
 
-    protected afterCreateElement() {
+    protected afterCreateElement(): void {
         this.controllers = {
             toggleSortUp: this.getElement().querySelector('._toggle_up'),
             toggleSortDown: this.getElement().querySelector('._toggle_down'),
@@ -59,7 +59,11 @@ export class HeaderComponent extends Component {
         window.addEventListener(WeatherAction.FILTER_WEATHER_RESET, () => this.resetFilterWeatherHandler());
     }
 
-    toggleSort(sortType: SortType, event: MouseEvent) {
+    protected getRenderOptions(): RenderOptions[] {
+        return [];
+    }
+
+    private toggleSort(sortType: SortType, event: MouseEvent): void {
         event.preventDefault();
         switch(sortType) {
             case SortType.ABC:
@@ -75,18 +79,14 @@ export class HeaderComponent extends Component {
         }
     }
 
-    protected getRenderOptions(): RenderOptions[] {
-        return [];
-    }
-
-    private filterByText(event: InputEvent) {
+    private filterByText(event: InputEvent): void {
         const inputText: string = (event.target as HTMLTextAreaElement).value;
         if(inputText.trim()) {
             this.service.setFilterText(inputText);
         } else this.service.setFilterText('');
     }
 
-    private filterByWeather(event: MouseEvent) {
+    private filterByWeather(event: MouseEvent): void {
         event.preventDefault();
 
         const btn: HTMLElement = event.target as HTMLButtonElement;
@@ -96,12 +96,12 @@ export class HeaderComponent extends Component {
         this.service.toggleFilterWeather(btn.dataset.weather as keyof Weather);
     }
 
-    private resetSortHandler() {
+    private resetSortHandler(): void {
         this.controllers.toggleSortDown.classList.remove('active');
         this.controllers.toggleSortUp.classList.remove('active');
     }
 
-    private resetFilterWeatherHandler() {
+    private resetFilterWeatherHandler(): void {
         this.controllers.weatherFilter.forEach((el:HTMLElement) => el.classList.remove('active'));
     }
 }

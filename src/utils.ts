@@ -1,4 +1,3 @@
-import {Component} from "./components/Component";
 import {City} from "./Interfaces";
 
 export enum CardType {
@@ -45,29 +44,10 @@ export const SortTypeMethods = {
     ABC: (a: City, b: City) => a.city.localeCompare(b.city),
     ZYX: (a: City, b: City) => -a.city.localeCompare(b.city),
     NONE: (a: City, b: City) => 0,
-};
+}
 
 export function createElement(template: string): Element {
     const element: Element = document.createElement('div');
     element.innerHTML = template;
     return element.firstElementChild;
-}
-
-export function renderElement(
-    container: Element,
-    element: Element,
-    insertPosition: InsertPosition = InsertPosition.AFTEREND
-): void {
-
-    switch(insertPosition) {
-        case InsertPosition.BEFOREEND:
-            container.append(element);
-            break;
-        case InsertPosition.AFTERBEGIN:
-            container.prepend(element);
-            break;
-        default:
-            container.insertAdjacentElement(insertPosition, element);
-            break;
-    }
 }

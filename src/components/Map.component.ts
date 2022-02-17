@@ -1,6 +1,6 @@
 import {Component} from "./Component";
 import {WeatherService} from "../Weather.service";
-import {City, Coordinates, RenderOptions} from "../Interfaces";
+import {City, Coordinates} from "../Interfaces";
 import {ChangePositionType, WeatherAction} from "../utils";
 
 const L = require('leaflet/dist/leaflet');
@@ -27,7 +27,15 @@ export class MapComponent extends Component {
         return (`<div id="map" class="my-map"></div>`);
     }
 
-    public init() {
+    protected afterCreateElement(): void {
+        window.addEventListener(WeatherAction.CARD_UPDATE_POSITION,
+            (event: CustomEvent) => this.changeDataHandler(event));
+        window.addEventListener(WeatherAction.MOUSE_OVER_CARD, (event: CustomEvent) => this.mouseOverCard(event));
+        window.addEventListener(WeatherAction.MOUSE_OUT_CARD, (event: CustomEvent) => this.mouseOutCard(event));
+        window.addEventListener(WeatherAction.MOUSE_CLICK_CARD, (event: CustomEvent) => this.mouseClickCard(event));
+    }
+
+    public afterInsertInDOM(): void {
         this.service.fetchMyPosition().then(data => {
             this.myPosition = data.loc.split(',').map((coordinate: string) => +coordinate);
 
@@ -39,32 +47,7 @@ export class MapComponent extends Component {
         });
     }
 
-    protected afterCreateElement(): void {
-        window.addEventListener(WeatherAction.CARD_UPDATE_POSITION,
-            (event: CustomEvent) => this.changeDataHandler(event));
-        window.addEventListener(WeatherAction.MOUSE_OVER_CARD, (event: CustomEvent) => this.mouseOverCard(event));
-        window.addEventListener(WeatherAction.MOUSE_OUT_CARD, (event: CustomEvent) => this.mouseOutCard(event));
-        window.addEventListener(WeatherAction.MOUSE_CLICK_CARD, (event: CustomEvent) => this.mouseClickCard(event));
-    }
-
-    private changeDataHandler(event: CustomEvent): void {
-        this.clearActiveMarkers();
-        const changeType: ChangePositionType = event.detail.changePositionType;
-        const cityWeather: City = event.detail.cityWeather;
-
-        switch(changeType) {
-            case ChangePositionType.SmallToBig:
-                this.addMarker(cityWeather);
-                break;
-            case ChangePositionType.BigToSmall:
-                this.removeMarker(cityWeather);
-                break;
-            default:
-                return;
-        }
-    }
-
-    private addMarker(cityWeather: City) {
+    private addMarker(cityWeather: City): void {
         const { coordinates }: { coordinates: Coordinates } = cityWeather;
         const city = cityWeather.city;
         const markerObj = L.marker([ coordinates.latitude, coordinates.longitude], {opacity: 0.7})
@@ -87,7 +70,7 @@ export class MapComponent extends Component {
         this.focusMarker(marker)
     }
 
-    private removeMarker(cityWeather: City) {
+    private removeMarker(cityWeather: City): void {
         const city = cityWeather.city;
 
         const idx = this.markers.findIndex((item: Marker) => item.city === city);
@@ -97,20 +80,36 @@ export class MapComponent extends Component {
         this.markers = this.markers.filter((item: Marker) => item.city !== city);
     }
 
-    private focusMarker(marker: Marker) {
+    private focusMarker(marker: Marker): void {
         const {lat, lng} = marker.markerObj.getLatLng();
         this.map.setView([lat, lng], 12);
     }
 
-    private focusCenter() {
-        this.map.setView(this.myPosition, 11);
+    private clearActiveMarkers(): void {
+        this.markers.forEach(item => {
+            item.isActive = false;
+            item.markerObj.setOpacity(0.7);
+        });
     }
 
-    protected getRenderOptions(): RenderOptions[] {
-        return [];
+    private changeDataHandler(event: CustomEvent): void {
+        this.clearActiveMarkers();
+        const changeType: ChangePositionType = event.detail.changePositionType;
+        const cityWeather: City = event.detail.cityWeather;
+
+        switch(changeType) {
+            case ChangePositionType.SmallToBig:
+                this.addMarker(cityWeather);
+                break;
+            case ChangePositionType.BigToSmall:
+                this.removeMarker(cityWeather);
+                break;
+            default:
+                return;
+        }
     }
 
-    private mouseOverCard(event: CustomEvent) {
+    private mouseOverCard(event: CustomEvent): void {
         const name = event.detail;
         const idx = this.markers.findIndex((item) => item.city === name);
         if(idx === -1) return;
@@ -118,7 +117,7 @@ export class MapComponent extends Component {
             this.markers[idx].markerObj.setOpacity(1);
     }
 
-    private mouseOutCard(event: CustomEvent) {
+    private mouseOutCard(event: CustomEvent): void {
         const name = event.detail;
         const idx = this.markers.findIndex((item) => item.city === name);
         if(idx === -1) return;
@@ -127,7 +126,7 @@ export class MapComponent extends Component {
             this.markers[idx].markerObj.setOpacity(0.7);
     }
 
-    private mouseClickCard(event: CustomEvent) {
+    private mouseClickCard(event: CustomEvent): void {
         const name = event.detail;
         const idx = this.markers.findIndex((item) => item.city === name);
         if(idx === -1) return;
@@ -136,12 +135,5 @@ export class MapComponent extends Component {
         this.markers[idx].markerObj.setOpacity(1);
         this.markers[idx].isActive = true;
         this.focusMarker(this.markers[idx]);
-    }
-
-    private clearActiveMarkers() {
-        this.markers.forEach(item => {
-            item.isActive = false;
-            item.markerObj.setOpacity(0.7);
-        });
     }
 }

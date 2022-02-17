@@ -1,6 +1,6 @@
 @import "panel";
 @import "map";
-
+@import "variables";
 
 body {
   margin: 0;
@@ -8,11 +8,10 @@ body {
   color: $text-color;
   font-size: 1.1rem;
   overflow: hidden;
-
 }
 
 ::-webkit-scrollbar {
-  width: 0px;
+  width: 0;
   background: transparent;
 }
 

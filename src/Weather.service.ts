@@ -4,7 +4,7 @@ import {CardType, ChangePositionType, createElement, SortType, SortTypeMethods, 
 export class WeatherService {
     allCities: City[] = [];
     chosenCities: City[] = [];
-    clientData: ClientData;
+    clientData: ClientData = { ip: '', city: '', region: '', country: '', loc: '', org: '', postal: '', timezone: '' };
     private dragOption: DragDropOptions = { dragElement: null, cardType: CardType.big };
     private sortType: SortType = SortType.ABC;
     private filterText: string = '';
@@ -17,11 +17,9 @@ export class WeatherService {
         stormy: false,
         metorite: false
     };
-    private emptyCardElement = createElement('<div class="big card-empty _card_empty _card"></div>')
+    private emptyCardElement: Element = createElement('<div class="big card-empty _card_empty _card"></div>')
 
-    constructor() {}
-
-    async fetchMyPosition() {
+    public async fetchMyPosition(): Promise<ClientData> {
         this.clientData = await fetch('https://ipinfo.io/json?token=be765effc66354')
             .then((res: Response) => res.json())
             .catch((e) => { throw new Error(e) });
@@ -29,7 +27,7 @@ export class WeatherService {
         return this.clientData;
     }
 
-    async fetchAllCity(): Promise<City[]> {
+    public async fetchAllCity(): Promise<City[]> {
         this.allCities = await fetch('https://geo-weather-json.herokuapp.com/db')
             .then((res: Response) => res.json())
             .then<City[]>(data => data.cities)
@@ -39,7 +37,7 @@ export class WeatherService {
         return this.allCities.sort(SortTypeMethods[this.sortType]);
     }
 
-    getCityForSmallList() {
+    public getCityForSmallList(): City[] {
         return this.allCities.filter(
             (cityWeather: City) => {
                 if(this.filterText.trim())
@@ -49,7 +47,7 @@ export class WeatherService {
             }).sort(SortTypeMethods[this.sortType]);
     }
 
-    getCityForBigList() {
+    public getCityForBigList(): City[] {
         return this.chosenCities.filter((cityWeather: City) => {
             return Object.keys(this.filterWeather)
                 .reduce<boolean>((accum: boolean, key: keyof Weather): boolean => {
@@ -62,44 +60,44 @@ export class WeatherService {
         });
     }
 
-    setSortType(sortType: SortType) {
+    public setSortType(sortType: SortType): void {
         this.sortType = sortType;
         this.emitEvent(WeatherAction.SORT_CHANGES, sortType);
     }
 
-    setFilterText(inputText: string) {
+    public setFilterText(inputText: string): void {
         if(this.filterText.trim() !== inputText.trim()) {
             this.filterText = inputText.toLocaleLowerCase();
             this.emitEvent(WeatherAction.SEARCH_CHANGES, inputText);
         }
     }
 
-    toggleFilterWeather(key: keyof Weather) {
+    public toggleFilterWeather(key: keyof Weather): void {
         this.filterWeather[key] = !this.filterWeather[key];
         this.emitEvent(WeatherAction.FILTER_CHANGES, this.filterWeather[key]);
     }
 
-    onMarkerOver(city: string) {
+    public onMarkerOver(city: string): void {
         this.emitEvent(WeatherAction.MOUSE_OVER_MARKER, city);
     }
 
-    onMarkerOut(city: string) {
+    public onMarkerOut(city: string): void {
         this.emitEvent(WeatherAction.MOUSE_OUT_MARKER, city);
     }
 
-    mouseOverCard(city: string) {
+    public mouseOverCard(city: string): void {
         this.emitEvent(WeatherAction.MOUSE_OVER_CARD, city);
     }
 
-    mouseOutCard(city: string) {
+    public mouseOutCard(city: string): void {
         this.emitEvent(WeatherAction.MOUSE_OUT_CARD, city);
     }
 
-    mouseClickCard(city: string) {
+    public mouseClickCard(city: string): void {
         this.emitEvent(WeatherAction.MOUSE_CLICK_CARD, city);
     }
 
-    public makeCardDraggable(element: Element, cityWeather: City) {
+    public makeCardDraggable(element: Element, cityWeather: City): void {
         element.addEventListener('dragstart', (event: DragEvent) => {
             event.dataTransfer.setData('text', 'anything');
             this.dragOption.dragElement = element as HTMLElement;
@@ -121,7 +119,7 @@ export class WeatherService {
         });
     }
 
-    public makeListDroppable(element: Element) {
+    public makeListDroppable(element: Element): void {
         element.addEventListener('dragover', (event: DragEvent) => {
             event.preventDefault();
 
@@ -153,7 +151,7 @@ export class WeatherService {
         element.addEventListener('drop', (event: Event) => event.preventDefault());
     }
 
-    private changePosition(prevCardName: string, cityWeather: City) {
+    private changePosition(prevCardName: string, cityWeather: City): void {
         const changePositionType: ChangePositionType = this.createChangePositionType();
 
         let toStorage: City[];
@@ -190,7 +188,7 @@ export class WeatherService {
         this.emitEvent(WeatherAction.CARD_UPDATE_POSITION, data);
     }
 
-    private resizeEmptyElement() {
+    private resizeEmptyElement(): void {
         if(this.emptyCardElement.classList.contains(this.dragOption.cardType))
             return;
 
@@ -204,12 +202,12 @@ export class WeatherService {
         }
     }
 
-    private unsetSort() {
+    private unsetSort(): void {
         this.sortType = SortType.NONE;
         this.emitEvent(WeatherAction.SORT_RESET);
     }
 
-    private unsetFilterWeather() {
+    private unsetFilterWeather(): void {
         this.filterWeather = {
             sunny: false,
             cloudy: false,
@@ -223,11 +221,7 @@ export class WeatherService {
         this.emitEvent(WeatherAction.FILTER_WEATHER_RESET);
     }
 
-    private createChangePositionType(): ChangePositionType {
-        return (this.dragOption.dragElement.dataset.type + '=>' + this.dragOption.cardType) as ChangePositionType;
-    }
-
-    private pushToStorage(toStorage: City[], prevCardName: string, cityWeather: City) {
+    private pushToStorage(toStorage: City[], prevCardName: string, cityWeather: City): void {
         if(prevCardName === undefined) {
             toStorage.unshift(cityWeather);
         } else {
@@ -238,7 +232,11 @@ export class WeatherService {
         }
     }
 
-    private emitEvent(action: WeatherAction, data?: any) {
+    private emitEvent(action: WeatherAction, data?: any): void {
         window.dispatchEvent(new CustomEvent(action, { detail: data }));
+    }
+
+    private createChangePositionType(): ChangePositionType {
+        return (this.dragOption.dragElement.dataset.type + '=>' + this.dragOption.cardType) as ChangePositionType;
     }
 }

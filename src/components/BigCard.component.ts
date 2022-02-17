@@ -1,13 +1,13 @@
 import {Component} from "./Component";
 import {WeatherService} from "../Weather.service";
-import {City, RenderOptions, Weather} from "../Interfaces";
+import {City, Weather} from "../Interfaces";
 import {CardType} from "../utils";
 
 export class BigCardComponent extends Component {
     service: WeatherService;
     props: {
         cityWeather: City
-    }
+    };
 
     constructor(cityWeather: City, service: WeatherService) {
         super();
@@ -53,7 +53,7 @@ export class BigCardComponent extends Component {
         `);
     }
 
-    protected afterCreateElement() {
+    protected afterCreateElement(): void {
         this.service.makeCardDraggable(this.getElement(), this.props.cityWeather);
 
         this.getElement().addEventListener('click', (event: Event) => this.clickHandler(event));
@@ -74,15 +74,11 @@ export class BigCardComponent extends Component {
         this.service.mouseClickCard(this.props.cityWeather.city);
     }
 
-    protected getRenderOptions(): RenderOptions[] {
-        return [];
-    }
-
-    private mouseEnterHandler(event: Event) {
+    private mouseEnterHandler(event: Event): void {
         this.service.mouseOverCard(this.props.cityWeather.city);
     }
 
-    private mouseLeaveHandler(event: Event) {
+    private mouseLeaveHandler(event: Event): void {
         this.service.mouseOutCard(this.props.cityWeather.city);
     }
 }
